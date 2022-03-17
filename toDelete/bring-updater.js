@@ -20,7 +20,7 @@ var BringUpdater = /** @class */ (function () {
             profile = matchProfiles[0];
         }
         else {
-            profile = new bring_profile_1.BringProfile(config.email, config.password, this.logger);
+            profile = new bring_profile_1.BringProfile(config.email, config.password, config.language, this.logger);
             this.bringProfiles.push(profile);
         }
         if (matchJobs.length > 0) {

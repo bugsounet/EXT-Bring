@@ -4,13 +4,13 @@ exports.BringProfile = void 0;
 var request = require("request");
 var ts_md5_1 = require("ts-md5");
 var BringProfile = /** @class */ (function () {
-    function BringProfile(email, password, logger) {
+    function BringProfile(email, password, language, logger) {
         this.authUrl = "https://api.getbring.com/rest/v2/bringauth";
         this.listUrl = "https://api.getbring.com/rest/v2/bringlists/{listId}";
         this.listsForUserUrl = "https://api.getbring.com/rest/v2/bringusers/{userid}/lists";
         this.listItemDetailsUrl = "https://api.getbring.com/rest/v2/bringlists/{listId}/details";
-        this.catalogUrl = "https://web.getbring.com/locale/catalog.de-DE.json";
-        this.articleLocalizationUrl = "https://web.getbring.com/locale/articles.de-DE.json";
+        this.catalogUrl = `https://web.getbring.com/locale/catalog.${language}.json`;
+        this.articleLocalizationUrl = `https://web.getbring.com/locale/articles.${language}.json`;
         this.imagePathTemplate = "https://web.getbring.com/assets/images/items/{filename}";
         this.catalog = null;
         this.articleLocalization = null;
