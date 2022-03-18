@@ -65,10 +65,10 @@ To use this module, add the following configuration block to the modules array i
       listName: "Liste",
       email: "someone@example.com",
       password: "secret",
+      lang: 0,
       columns: 3,
       maxRows: 5,
       updateInterval: 30000,
-      lang: 0,
       showBackground: true,
       showBox: true
     }
