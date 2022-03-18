@@ -44,14 +44,17 @@ To use this module, add the following configuration block to the modules array i
 
 | Option           | Description
 |----------------- |-----------
-| `listname`       | *Required* The name of the List you want to display. Please make sure this matches EXACTLY. The Name is case sensitive. 
+| `listName`       | *Required* The name of the List you want to display. Please make sure this matches EXACTLY. The Name is case sensitive. 
 | `email`          | *Required* The email adress to log in to your bring account 
-| `password`       | *Required* The password to log in to your bring account 
+| `password`       | *Required* The password to log in to your bring account
+| `lang`           | *Required* Your language code number
 | `columns`        | *Optional* The number of colums in the table view (default = `4`)
-| `maxrows`        | *Optional* The maximum number of rows to display in the table view (default = `4`)
+| `maxRows`        | *Optional* The maximum number of rows to display in the table view (default = `4`)
 | `updateInterval` | *Optional* The update frequency in milliseconds. (default = `60000` = 1 Minute, cannot be set to less than `30000` = 30 seconds to avoid mistakes)
-| `debug` | *Optional* Writes many more log entries to the console if set to `true` to identify failures (default = `false`)
-|`language`| *Optional* Your language code for displaying (default = `fr-FR`)
+| `debug`          | *Optional* Writes many more log entries to the console if set to `true` to identify failures (default = `false`)
+| `showBackground` | *Optional* Display a Background around item place or not
+| `showBox`        | *Optional* Display a Box around items 
+
 ### Example configuration:
 ```js
   {
@@ -59,16 +62,44 @@ To use this module, add the following configuration block to the modules array i
     position: "top_right",
     config: {
       debug: false,
-      listname: "Liste",
+      listName: "Liste",
       email: "someone@example.com",
       password: "secret",
       columns: 3,
-      maxrows: 5,
+      maxRows: 5,
       updateInterval: 30000,
-      language: "fr-FR"
+      lang: 0,
+      showBackground: true,
+      showBox: true
     }
   }
 ```
+
+### `lang` code number
+
+| Number  | Language
+|---------|-----------
+|  0 | French (default)
+|  1 | German from austria
+|  2 | Swiss German
+|  3 |  German
+|  4 | Spanish
+|  5 | British english
+|  6 | American english
+|  7 | Canadian english
+|  8 | Australian english
+|  9 | French from switzerland
+|  10 | French
+|  11 | Italian from switzerland
+|  12 | Italian
+|  13 | portuguese
+|  14 | Dutch
+|  15 | Hungarian
+|  16 | Norwegian
+|  17 | Polish
+|  18 | Russian
+|  19 | Swedish
+|  20 | Turkish
 
 ## Example Screen:
 ![Screenshot](Screenshot.JPG)

@@ -7,42 +7,50 @@
  * MIT Licensed.
  **/
 
-/** todo: review code in deep
- * apply @bugsounet style
- * add EXT Compatibility
- **/
-
 var NodeHelper = require("node_helper");
 var bring = require("./lib/bring-lib");
 var logBring = (...args) => { /* do nothing */ }
 
 module.exports = NodeHelper.create({
-  updater: new bring.BringUpdater(),
-  running: false,
-  currentInterval: null,
-  intervalTime: 60000,
+  start: function () {
+    this.updater= new bring.BringUpdater()
+    this.running= false
+    this.currentInterval= null
+    this.intervalTime= 60000
+  },
 
   socketNotificationReceived: function (notification, payload) {
-    if (notification === "bringList-REGISTER") {
-      if (payload.debug) logBring = (...args) => { console.log("[BRING]", ...args) }
-      logBring("Received registration notification.")
-      this.updater.register(payload)
-      this.intervalTime = Math.max(30000, payload.updateInterval)
-      this.stopLoop()
-      this.ensureLoop()
+    switch (notification) {
+      case "INIT":
+        this.config = payload
+        if (payload.debug) logBring = (...args) => { console.log("[BRING]", ...args) }
+        console.log("[BRINGS] " + require('./package.json').name + " Version:", require('./package.json').version , "rev:", require('./package.json').rev)
+        this.initialize()
+        break
+      case "EXT-Bring-REGISTER":
+        logBring("Received registration demand.")
+        this.initialize()
+        break
+      case "EXT-Bring-SUSPEND":
+        logBring("Suspended.")
+        this.updater.unregister(this.config)
+        if (!this.updater.hasJobs()) {
+          this.stopLoop()
+        }
+        break
     }
-    if (notification === "bringList-SUSPEND") {
-      logBring("Received suspend notification.")
-      this.updater.unregister(payload)
-      if (!this.updater.hasJobs()) {
-        this.stopLoop()
-      }
-    }
+  },
+
+  initialize: function() {
+    this.updater.register(this.config)
+    this.intervalTime = Math.max(30000, this.config.updateInterval)
+    this.stopLoop()
+    this.ensureLoop()
   },
 
   stopLoop: function () {
     if (this.running) {
-      logBring("Loop running. Stopping.")
+      logBring("Stop.")
       clearInterval(this.currentInterval)
       this.running = false
       this.currentInterval = null
@@ -51,14 +59,14 @@ module.exports = NodeHelper.create({
 
   ensureLoop: function () {
     if (!this.running) {
-      logBring("Loop not running. Starting.")
+      logBring("Starting.")
       this.running = true
       this.updater.refreshLists(l => {
-        this.sendSocketNotification("bringList-LISTUPDATE", l)
+        this.sendSocketNotification("EXT-Bring-LISTUPDATE", l)
       })
       this.currentInterval = setInterval(() => {
         this.updater.refreshLists(l => {
-          this.sendSocketNotification("bringList-LISTUPDATE", l)
+          this.sendSocketNotification("EXT-Bring-LISTUPDATE", l)
         })
       }, this.intervalTime)
     }

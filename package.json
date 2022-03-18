@@ -1,13 +1,26 @@
 {
   "name": "EXT-Bring",
   "version": "1.0.0",
+  "rev": "220318",
   "description": "Displays Your Bring! List",
-  "main": "EXT-Bring",
+  "main": "EXT-Bring.js",
+  "scripts": {
+    "preinstall": "installer/preinstall.sh",
+    "postinstall": "installer/postinstall.sh",
+    "update": "installer/update.sh"
+  },
   "authors": [
     "Robert Seidt",
     "@bugsounet"
   ],
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bugsounet/EXT-Bring"
+  },
+  "bugs": {
+    "url": "https://forum.bugsounet.fr"
+  },
   "dependencies": {
     "request": "2.88.2",
     "ts-md5": "1.2.9"
