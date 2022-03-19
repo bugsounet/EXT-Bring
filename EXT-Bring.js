@@ -11,6 +11,7 @@ Module.register("EXT-Bring", {
     maxRows: 4,
     showBackground: true,
     showBox: true,
+    showListName: true,
     updateInterval: 30000
   },
 
@@ -84,7 +85,8 @@ Module.register("EXT-Bring", {
     if (notification === "EXT-Bring-LISTUPDATE") {
       if (payload.listName.toLowerCase() === this.config.listName.toLowerCase()) {
         this.listData = payload
-        this.updateDom(100)
+        if (this.config.showListName) this.data.header = payload.listName
+        this.updateDom(400)
       }
     }
   },
