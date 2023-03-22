@@ -1,7 +1,7 @@
 {
   "name": "EXT-Bring",
-  "version": "1.0.1",
-  "rev": "230312",
+  "version": "1.1.0",
+  "rev": "230322",
   "description": "Displays Your Bring! List",
   "main": "EXT-Bring.js",
   "scripts": {
@@ -22,7 +22,8 @@
     "url": "https://forum.bugsounet.fr"
   },
   "dependencies": {
-    "request": "2.88.2",
+    "https": "^1.0.0",
+    "node-fetch": "^3.3.1",
     "ts-md5": "1.2.9"
   }
 }

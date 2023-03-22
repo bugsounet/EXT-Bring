@@ -15,7 +15,7 @@ Module.register("EXT-Bring", {
     updateInterval: 30000
   },
 
-  requiresVersion: "2.18.0",
+  requiresVersion: "2.22.0",
 
   start: async function () {
     this.listData= null

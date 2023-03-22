@@ -24,7 +24,7 @@ module.exports = NodeHelper.create({
       case "INIT":
         this.config = payload
         if (payload.debug) logBring = (...args) => { console.log("[BRING]", ...args) }
-        console.log("[BRINGS] " + require('./package.json').name + " Version:", require('./package.json').version , "rev:", require('./package.json').rev)
+        console.log("[BRING] " + require('./package.json').name + " Version:", require('./package.json').version , "rev:", require('./package.json').rev)
         this.initialize()
         break
       case "EXT-Bring-REGISTER":
