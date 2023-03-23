@@ -1,6 +1,7 @@
 /* global Module */
 
 Module.register("EXT-Bring", {
+  requiresVersion: "2.22.0",
   defaults: {
     debug: false,
     listName: "",
@@ -15,53 +16,8 @@ Module.register("EXT-Bring", {
     updateInterval: 30000
   },
 
-  requiresVersion: "2.18.0",
-
   start: async function () {
     this.listData= null
-    this.langDB= {
-      0: "fr-FR",
-      1: "de-AT",
-      2: "de-CH",
-      3: "de-DE",
-      4: "es-ES",
-      5: "en-GB",
-      6: "en-US",
-      7: "en-CA",
-      8: "en-AU",
-      9: "fr-CH",
-      10: "fr-FR",
-      11: "it-CH",
-      12: "it-IT",
-      13: "pt-BR",
-      14: "nl-NL",
-      15: "hu-HU",
-      16: "nb-NO",
-      17: "pl-PL",
-      18: "ru-RU",
-      19: "sv-SE",
-      20: "tr-TR"
-    }
-    this.config.language = await this.languageConfig()
-    console.warn("[BRING] Language set to:", this.config.language)
-  },
-
-  languageConfig: function () {
-    if (this.config.lang === 0) return "fr-FR"
-    else if (!this.config.lang || isNaN(this.config.lang) || (this.config.lang > Object.keys(this.langDB).length-1) || (this.config.lang < 0)) {
-      console.warn("[BRING] Mismake on config lang...")
-      return "fr-FR"
-    }
-
-    return new Promise(resolve => {
-      Object.entries(this.langDB).some(entry => {
-        const [number,key] = entry
-        if (this.config.lang == number) {
-          resolve(key)
-          return key // stop process if match
-        }
-      })
-    })
   },
 
   notificationReceived: function(notification, payload, sender) {
@@ -72,17 +28,17 @@ Module.register("EXT-Bring", {
       case "GAv5_READY":
         if (sender.name == "MMM-GoogleAssistant") this.sendNotification("EXT_HELLO", this.name)
         break
-      case "EXT_BRING-START":
-        this.sendSocketNotification("EXT-Bring-START")
+      case "EXT_BRING-START": // can be used with Gateway/EXT-Screen later
+        this.sendSocketNotification("START")
         break
-      case "EXT_BRING-STOP":
-        this.sendSocketNotification("EXT-Bring-STOP")
+      case "EXT_BRING-STOP": // can be used with Gateway/EXT-Screen later
+        this.sendSocketNotification("STOP")
         break
     }
   },
 
   socketNotificationReceived: function (notification, payload) {
-    if (notification === "EXT-Bring-LISTUPDATE") {
+    if (notification === "UPDATE") {
       if (payload.listName.toLowerCase() === this.config.listName.toLowerCase()) {
         this.listData = payload
         if (this.config.showListName) this.data.header = payload.listName
@@ -92,9 +48,7 @@ Module.register("EXT-Bring", {
   },
 
   getStyles: function () {
-    return [
-      "EXT-Bring.css"
-    ]
+    return [ "EXT-Bring.css" ]
   },
 
   getDom: function () {
@@ -104,9 +58,7 @@ Module.register("EXT-Bring", {
     Bring.style.maxHeight= this.config.maxRows * 119 + "px"
 
     if (this.listData) {
-      var listContent = this.listData
-      listContent.items.forEach(element => {
-
+      this.listData.items.forEach(element => {
         var BringContener= document.createElement("div")
         BringContener.id = "EXT-Bring_Contener"
         if (this.config.showBackground) BringContener.classList.add("background")
@@ -118,7 +70,6 @@ Module.register("EXT-Bring", {
         BringContener.appendChild(BringItem)
 
         // Upper
-
         var BringItemUpper= document.createElement("div")
         BringItemUpper.id = "EXT-Bring_Item-Upper"
         BringItem.appendChild(BringItemUpper)
@@ -141,7 +92,6 @@ Module.register("EXT-Bring", {
         BringItemUpper.appendChild(BringIndicatorsRight)
 
         // Lower
-
         var BringItemLower= document.createElement("div")
         BringItemLower.id = "EXT-Bring_Item-Lower"
         BringItem.appendChild(BringItemLower)
