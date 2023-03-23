@@ -5,16 +5,9 @@
 
 "use strict";
 
-const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
-const https = require('https');
-const httpsAgent = new https.Agent({
-  rejectUnauthorized: false,
-});
-var ts_md5 = require("ts-md5");
-
 /** Profile **/
 var BringProfile = /** @class */ (function () {
-  function BringProfile(email, password, language, logger) {
+  function BringProfile(email, password, language, logger, lib) {
     this.authUrl = "https://api.getbring.com/rest/v2/bringauth";
     this.listUrl = "https://api.getbring.com/rest/v2/bringlists/{listId}";
     this.listsForUserUrl = "https://api.getbring.com/rest/v2/bringusers/{userid}/lists";
@@ -28,6 +21,10 @@ var BringProfile = /** @class */ (function () {
     this.email = email;
     this.password = password;
     this.logger = logger;
+    this.lib = lib;
+    this.httpsAgent = new this.lib.https.Agent({
+      rejectUnauthorized: false,
+    });
   }
 
   BringProfile.prototype.fetchGetOptions = function () {
@@ -46,7 +43,7 @@ var BringProfile = /** @class */ (function () {
     if (retryNo === void 0) { retryNo = 0; }
     let response, data
     try {
-      response = await fetch(this.listsForUserUrl.replace(/\{userid\}/g, this.userid), this.fetchGetOptions())
+      response = await _this.lib.fetch(this.listsForUserUrl.replace(/\{userid\}/g, this.userid), this.fetchGetOptions())
       data = await response.json()
     } catch (err) {
       if (retryNo < 3) {
@@ -79,8 +76,8 @@ var BringProfile = /** @class */ (function () {
     if (retryNo === void 0) { retryNo = 0; }
     let response, data
     try {
-      response = await fetch(this.catalogUrl), {
-        agent: httpsAgent,
+      response = await _this.lib.fetch(this.catalogUrl), {
+        agent: _this.httpsAgent,
       }
       data = await response.json()
     } catch (err) {
@@ -101,8 +98,8 @@ var BringProfile = /** @class */ (function () {
     this.articleLocalization = [];
     let response, data
     try {
-      response = await fetch(this.articleLocalizationUrl), {
-        agent: httpsAgent,
+      response = await _this.lib.fetch(this.articleLocalizationUrl), {
+        agent: _this.httpsAgent,
       }
       data = await response.json()
     } catch (err) {
@@ -147,7 +144,7 @@ var BringProfile = /** @class */ (function () {
     params.append("password", this.password)
 
     try {
-      response = await fetch(this.authUrl, {
+      response = await _this.lib.fetch(this.authUrl, {
         method: "POST",
         body: params
       })
@@ -195,7 +192,7 @@ var BringProfile = /** @class */ (function () {
     }
   };
 
-  BringProfile.prototype.fetchList = async function (listId, reauthenticate, done, retryNo) {
+   BringProfile.prototype.fetchList = async function (listId, reauthenticate, done, retryNo) {
     var _this = this;
     if (retryNo === void 0) { retryNo = 0; }
     if (!this.access_token && reauthenticate) {
@@ -204,7 +201,7 @@ var BringProfile = /** @class */ (function () {
     else {
       let response, data
       try {
-        response = await fetch(this.listUrl.replace(/\{listId\}/, listId), this.fetchGetOptions())
+        response = await _this.lib.fetch(this.listUrl.replace(/\{listId\}/, listId), this.fetchGetOptions())
         data = await response.json()
       } catch (err) {
         if (retryNo < 3) {
@@ -228,7 +225,7 @@ var BringProfile = /** @class */ (function () {
           list.items.push({ name: element.name, localName: _this.getLocalName(element.name), specification: element.specification, iconFileName: "", iconId: "", sectionId: "", imagePath: "" });
         });
         var hashbase = JSON.stringify({ items: list.items, head: list.listName + list.listId });
-        var newHash = ts_md5.Md5.hashStr(hashbase);
+        var newHash = _this.lib.tsMd5.Md5.hashStr(hashbase);
         list.hash = newHash;
         done(list);
       }
@@ -240,15 +237,15 @@ var BringProfile = /** @class */ (function () {
     if (retryNo === void 0) { retryNo = 0; }
     let response, data
     try {
-      response = await fetch(this.listItemDetailsUrl.replace(/\{listId\}/, list.listId), this.fetchGetOptions())
+      response = await _this.lib.fetch(this.listItemDetailsUrl.replace(/\{listId\}/, list.listId), this.fetchGetOptions())
       data = await response.json()
     } catch (err) {
       if (retryNo < 3) {
-        window.setTimeout(function () { _this.getListDetail(list, callback, ++retryNo); }, 1000);
+        setTimeout(function () { _this.getListDetail(list, callback, ++retryNo); }, 1000);
       }
       else {
         _this.logger.logError("Unexpected error when connecting to bring server: " + err + ". Hopefully temporary. Will retry in 30 minutes.");
-        window.setTimeout(function () { _this.getListDetail(list, callback); }, 1800000);
+        setTimeout(function () { _this.getListDetail(list, callback); }, 1800000);
       }
     }
 
@@ -329,11 +326,11 @@ var BringLogger = /** @class */ (function () {
   }
   BringLogger.prototype.log = function (message, verbose) {
     if (!verbose || this.config.debug) {
-      console.log("[BRING] " + message);
+      console.log("[BRING] [CORE] " + message);
     }
   };
   BringLogger.prototype.logError = function (message) {
-    console.error("[BRING] " + message);
+    console.error("[BRING] [CORE] " + message);
   };
   return BringLogger;
 }());
@@ -341,7 +338,8 @@ exports.BringLogger = BringLogger;
 
 /** Updater **/
 var BringUpdater = /** @class */ (function () {
-  function BringUpdater() {
+  function BringUpdater(lib) {
+    this.lib = lib;
     this.bringProfiles = [];
     this.queryJobs = [];
   }
@@ -358,7 +356,7 @@ var BringUpdater = /** @class */ (function () {
       profile = matchProfiles[0];
     }
     else {
-      profile = new BringProfile(config.email, config.password, config.language, this.logger);
+      profile = new BringProfile(config.email, config.password, config.language, this.logger, this.lib);
       this.bringProfiles.push(profile);
     }
     if (matchJobs.length > 0) {
