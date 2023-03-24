@@ -22,11 +22,10 @@ Module.register("EXT-Bring", {
 
   notificationReceived: function(notification, payload, sender) {
     switch (notification) {
-      case "DOM_OBJECTS_CREATED":
-        this.sendSocketNotification("INIT", this.config)
-        break
-      case "GAv5_READY":
-        if (sender.name == "MMM-GoogleAssistant") this.sendNotification("EXT_HELLO", this.name)
+      case "GW_READY":
+        if (sender.name === "Gateway") {
+          this.sendSocketNotification("INIT", this.config)
+        }
         break
       case "EXT_BRING-START": // can be used with Gateway/EXT-Screen later
         this.sendSocketNotification("START")
@@ -38,12 +37,17 @@ Module.register("EXT-Bring", {
   },
 
   socketNotificationReceived: function (notification, payload) {
-    if (notification === "UPDATE") {
-      if (payload.listName.toLowerCase() === this.config.listName.toLowerCase()) {
-        this.listData = payload
-        if (this.config.showListName) this.data.header = payload.listName
-        this.updateDom(400)
-      }
+    swithch (notification) {
+      case "INITIALIZED":
+        this.sendNotification("EXT_HELLO", this.name)
+        break
+      case "UPDATE":
+        if (payload.listName.toLowerCase() === this.config.listName.toLowerCase()) {
+          this.listData = payload
+          if (this.config.showListName) this.data.header = payload.listName
+          this.updateDom(400)
+        }
+        break
     }
   },
 

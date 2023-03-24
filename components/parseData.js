@@ -26,7 +26,7 @@ class parseData {
       return
     }
     this.updater= new this.lib.bring.BringUpdater(this.lib)
-    this.start() // force to start like v1.0
+    this.sendSocketNotification("INITIALIZED")
   }
   
   start() {

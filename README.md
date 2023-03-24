@@ -1,12 +1,8 @@
 # EXT-Bring
 
-EXT-Bring is a module for the [MagicMirror](https://github.com/MichMich/MagicMirror) project by [Michael Teeuw](https://github.com/MichMich).
+This plugin show your current shopping list on MagicMirror with Bring!
 
-This module show your current shopping list on MagicMirror
-
-This module is an Extented plugins for `MMM-GoogleAssistant` v5.x
-
-Naturally, you can use this EXT module with or without out `MMM-GoogleAssistant` v5.x
+This module is an Extented plugins for `MMM-GoogleAssistant`
 
 # Informations
 
