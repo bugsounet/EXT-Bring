@@ -37,7 +37,7 @@ Module.register("EXT-Bring", {
   },
 
   socketNotificationReceived: function (notification, payload) {
-    swithch (notification) {
+    switch (notification) {
       case "INITIALIZED":
         this.sendNotification("EXT_HELLO", this.name)
         break
