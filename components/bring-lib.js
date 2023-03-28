@@ -38,92 +38,90 @@ var BringProfile = /** @class */ (function () {
     };
   };
 
-  BringProfile.prototype.getListsForUser = async function (callback, retryNo) {
+  BringProfile.prototype.getListsForUser = function (callback, retryNo) {
     var _this = this;
     if (retryNo === void 0) { retryNo = 0; }
-    let response, data
-    try {
-      response = await _this.lib.fetch(this.listsForUserUrl.replace(/\{userid\}/g, this.userid), this.fetchGetOptions())
-      data = await response.json()
-    } catch (err) {
-      if (retryNo < 3) {
-        setTimeout(function () { _this.getListsForUser(callback, ++retryNo); }, 1000);
-      } else {
-        _this.logger.logError("Unexpected error connecting to bringList: " + err + ". Hopefully temporary. Will retry in 30 minutes.");
-        setTimeout(function () { _this.getListsForUser(callback); }, 1800000);
-      }
-    }
-
-    if (response && response.status != 200) {
-      _this.logger.logError("Received unexpected status code from bring server when loading Lists for User: " + response.statusCode);
-    } else {
-      if (data.lists) {
-        data.lists.forEach(function (item) {
-          if (_this.userLists.filter(function (l) { return l.listId === item.listUuid; }).length === 0) {
-            _this.userLists.push({ hash: '', items: [], listId: item.listUuid, listName: item.name });
+    _this.lib.fetch(this.listsForUserUrl.replace(/\{userid\}/g, this.userid), this.fetchGetOptions())
+      .then(async response => {
+        let data = await response.json()
+        if (response && response.status != 200) {
+          _this.logger.logError("Received unexpected status code from bring server when loading Lists for User: " + response.statusCode);
+        } else {
+          if (data.lists) {
+            data.lists.forEach(function (item) {
+              if (_this.userLists.filter(function (l) { return l.listId === item.listUuid; }).length === 0) {
+                _this.userLists.push({ hash: '', items: [], listId: item.listUuid, listName: item.name });
+              }
+            });
+            callback();
           }
-        });
-        callback();
-      }
-      else {
-        _this.logger.logError("Could not find 'lists' Element in Response from bring: " + data);
-      }
-    }
+          else {
+            _this.logger.logError("Could not find 'lists' Element in Response from bring: " + data);
+          }
+        }
+      })
+     .catch (err => {
+        if (retryNo < 3) {
+          setTimeout(() => { _this.getListsForUser(callback, ++retryNo); }, 1000);
+        } else {
+          _this.logger.logError("Unexpected error connecting to bringList: " + err + ". Hopefully temporary. Will retry in 30 minutes.");
+          setTimeout(() => { _this.getListsForUser(callback); }, 1800000);
+        }
+      })
   };
 
-  BringProfile.prototype.initializeCatalog = async function (callback, retryNo) {
+  BringProfile.prototype.initializeCatalog = function (callback, retryNo) {
     var _this = this;
     if (retryNo === void 0) { retryNo = 0; }
-    let response, data
-    try {
-      response = await _this.lib.fetch(this.catalogUrl), {
-        agent: _this.httpsAgent,
-      }
-      data = await response.json()
-    } catch (err) {
-      if (retryNo < 3) {
-        setTimeout(function () { _this.initializeCatalog(callback, ++retryNo); }, 1000);
-      } else {
-        _this.logger.logError("Unexpected error during download of Catalog: " + err + ". Hopefully temporary. Will retry in 30 minutes.");
-        setTimeout(function () { _this.initializeCatalog(callback); }, 1800000);
-      }
-    }
-    _this.catalog = data.catalog;
-    callback();
+    _this.lib.fetch(this.catalogUrl, {
+      agent: _this.httpsAgent,
+    })
+      .then (async response => {
+        let data = await response.json()
+        _this.catalog = data.catalog;
+        callback();
+      })
+      .catch (err => {
+        if (retryNo < 3) {
+          setTimeout(() => { _this.initializeCatalog(callback, ++retryNo); }, 1000);
+        } else {
+          _this.logger.logError("Unexpected error during download of Catalog: " + err + ". Hopefully temporary. Will retry in 30 minutes.");
+          setTimeout(()=> { _this.initializeCatalog(callback); }, 1800000);
+        }
+      })
   };
 
-  BringProfile.prototype.initializeArticleLocalization = async function (callback, retryNo) {
+  BringProfile.prototype.initializeArticleLocalization = function (callback, retryNo) {
     var _this = this;
     if (retryNo === void 0) { retryNo = 0; }
     this.articleLocalization = [];
-    let response, data
-    try {
-      response = await _this.lib.fetch(this.articleLocalizationUrl), {
-        agent: _this.httpsAgent,
-      }
-      data = await response.json()
-    } catch (err) {
-      if (retryNo < 3) {
-        setTimeout(function () { _this.initializeArticleLocalization(callback, ++retryNo); }, 1000);
-      } else {
-        _this.logger.logError("Unexpected error during download of ArticleLocalization: " + err + ". Hopefully temporary. Will retry in 30 minutes.");
-        setTimeout(function () { _this.initializeArticleLocalization(callback); }, 1800000);
-      }
-    }
-    for (var key in data) {
-      if (Object.prototype.hasOwnProperty.call(data, key)) {
-        var val = data[key];
-        _this.articleLocalization.push({ key: key, value: val });
-      }
-    }
-    callback();
+    _this.lib.fetch(this.articleLocalizationUrl, {
+      agent: _this.httpsAgent,
+    })
+      .then(async response => {
+        let data = await response.json()
+        for (var key in data) {
+          if (Object.prototype.hasOwnProperty.call(data, key)) {
+            var val = data[key];
+            _this.articleLocalization.push({ key: key, value: val });
+          }
+        }
+        callback();
+      })
+      .catch (err => {
+        if (retryNo < 3) {
+          setTimeout(() => { _this.initializeArticleLocalization(callback, ++retryNo); }, 1000);
+        } else {
+          _this.logger.logError("Unexpected error during download of ArticleLocalization: " + err + ". Hopefully temporary. Will retry in 30 minutes.");
+          setTimeout(() => { _this.initializeArticleLocalization(callback); }, 1800000);
+        }
+      })
   };
 
-  BringProfile.prototype.login = async function (callback, retryNo) {
+  BringProfile.prototype.login = function (callback, retryNo) {
     var _this = this;
     if (retryNo === void 0) { retryNo = 0; }
     var authenticationperformed = false;
-    let response, data
     if (!this.articleLocalization) {
       this.initializeArticleLocalization(function () {
         if (_this.catalog && authenticationperformed) {
@@ -143,33 +141,33 @@ var BringProfile = /** @class */ (function () {
     params.append("email", this.email)
     params.append("password", this.password)
 
-    try {
-      response = await _this.lib.fetch(this.authUrl, {
-        method: "POST",
-        body: params
-      })
-      data = await response.json()
-    } catch (err) {
-      if (retryNo < 3) {
-        _this.login(callback, ++retryNo);
-      }
-      else {
-        _this.logger.logError("Unexpected error when connecting to bring server: " + err + ". Hopefully temporary. Will retry in 30 minutes.");
-        setTimeout(function () { _this.login(callback); }, 1800000);
-      }
-    }
-
-    if (response && response.status == 401) {
-        _this.logger.logError("Could not authenticate to bringList.");
-    } else {
-      _this.access_token = data.access_token;
-      _this.userid = data.uuid;
-      _this.getListsForUser(function () {
-        if (_this.articleLocalization && _this.catalog) {
-          callback();
+    _this.lib.fetch(this.authUrl, {
+      method: "POST",
+      body: params
+    })
+      .then(async response => {
+        let data = await response.json()
+        if (response && response.status == 401) {
+          _this.logger.logError("Could not authenticate to bringList.");
+        } else {
+          _this.access_token = data.access_token;
+          _this.userid = data.uuid;
+          _this.getListsForUser(function () {
+            if (_this.articleLocalization && _this.catalog) {
+              callback();
+            }
+          });
         }
-      });
-    }
+      })
+      .catch (err => {
+        if (retryNo < 3) {
+          _this.login(callback, ++retryNo);
+        }
+        else {
+          _this.logger.logError("Unexpected error when connecting to bring server: " + err + ". Hopefully temporary. Will retry in 30 minutes.");
+          setTimeout(() => { _this.login(callback); }, 1800000);
+        }
+      })
   };
 
   BringProfile.prototype.loadList = function (listName, done) {
@@ -192,78 +190,75 @@ var BringProfile = /** @class */ (function () {
     }
   };
 
-   BringProfile.prototype.fetchList = async function (listId, reauthenticate, done, retryNo) {
+   BringProfile.prototype.fetchList = function (listId, reauthenticate, done, retryNo) {
     var _this = this;
     if (retryNo === void 0) { retryNo = 0; }
     if (!this.access_token && reauthenticate) {
       this.login(function () { _this.fetchList(listId, false, done); });
     }
     else {
-      let response, data
-      try {
-        response = await _this.lib.fetch(this.listUrl.replace(/\{listId\}/, listId), this.fetchGetOptions())
-        data = await response.json()
-      } catch (err) {
-        if (retryNo < 3) {
-          setTimeout(function () { _this.fetchList(listId, reauthenticate, done, ++retryNo); }, 1000);
-        }
-        else {
-          _this.logger.logError("Unexpected error when connecting to bring server: " + err + ". Hopefully temporary. Will retry in 30 minutes.");
-          setTimeout(function () { _this.fetchList(listId, reauthenticate, done); }, 1800000);
-        }
-      }
-      if (response && response.status == 401 && reauthenticate) {
-        _this.login(function () { _this.fetchList(listId, false, done); });
-      }
-      else if (response && response.status != 200) {
-        _this.logger.logError("Received unexpected status code from bring server: " + response.status);
-      }
-      else {
-        var list = _this.userLists.filter(function (l) { return l.listId === listId; })[0];
-        list.items = [];
-        data.purchase.forEach(function (element) {
-          list.items.push({ name: element.name, localName: _this.getLocalName(element.name), specification: element.specification, iconFileName: "", iconId: "", sectionId: "", imagePath: "" });
-        });
-        var hashbase = JSON.stringify({ items: list.items, head: list.listName + list.listId });
-        var newHash = _this.lib.tsMd5.Md5.hashStr(hashbase);
-        list.hash = newHash;
-        done(list);
-      }
+      _this.lib.fetch(this.listUrl.replace(/\{listId\}/, listId), this.fetchGetOptions())
+        .then( async response => {
+          let data = await response.json()
+          if (response && response.status == 401 && reauthenticate) {
+            _this.login(function () { _this.fetchList(listId, false, done); });
+          }
+          else if (response && response.status != 200) {
+            _this.logger.logError("Received unexpected status code from bring server: " + response.status);
+          } else {
+            var list = _this.userLists.filter(function (l) { return l.listId === listId; })[0];
+            list.items = [];
+            data.purchase.forEach(function (element) {
+              list.items.push({ name: element.name, localName: _this.getLocalName(element.name), specification: element.specification, iconFileName: "", iconId: "", sectionId: "", imagePath: "" });
+            });
+            var hashbase = JSON.stringify({ items: list.items, head: list.listName + list.listId });
+            var newHash = _this.lib.tsMd5.Md5.hashStr(hashbase);
+            list.hash = newHash;
+            done(list);
+          }
+        })
+        .catch (err => {
+          if (retryNo < 3) {
+            setTimeout(()=> { _this.fetchList(listId, reauthenticate, done, ++retryNo); }, 1000);
+          } else {
+            _this.logger.logError("Unexpected error when connecting to bring server: " + err + ". Hopefully temporary. Will retry in 30 minutes.");
+            setTimeout(()=> { _this.fetchList(listId, reauthenticate, done); }, 1800000);
+          }
+        })
     }
   };
 
-  BringProfile.prototype.getListDetail = async function (list, callback, retryNo) {
+  BringProfile.prototype.getListDetail = function (list, callback, retryNo) {
     var _this = this;
     if (retryNo === void 0) { retryNo = 0; }
-    let response, data
-    try {
-      response = await _this.lib.fetch(this.listItemDetailsUrl.replace(/\{listId\}/, list.listId), this.fetchGetOptions())
-      data = await response.json()
-    } catch (err) {
-      if (retryNo < 3) {
-        setTimeout(function () { _this.getListDetail(list, callback, ++retryNo); }, 1000);
-      }
-      else {
-        _this.logger.logError("Unexpected error when connecting to bring server: " + err + ". Hopefully temporary. Will retry in 30 minutes.");
-        setTimeout(function () { _this.getListDetail(list, callback); }, 1800000);
-      }
-    }
-
-    if (response && response.status != 200) {
-      _this.logger.logError("Received unexpected status code from bring server: " + response.status);
-    } else {
-      list.items.forEach(function (listItem) {
-        data.forEach(function (detailElement) {
-          if (listItem.name == detailElement.itemId) {
-            listItem.iconId = detailElement.userIconItemId;
-            listItem.sectionId = detailElement.userSectionId;
-          }
-        });
-        _this.setIconUrl(listItem);
-      });
-      _this.logger.log("reporting new list", true);
-      callback(list);
-    }
+    _this.lib.fetch(this.listItemDetailsUrl.replace(/\{listId\}/, list.listId), this.fetchGetOptions())
+      .then(async response => {
+        let data = await response.json()
+        if (response && response.status != 200) {
+          _this.logger.logError("Received unexpected status code from bring server: " + response.status);
+        } else {
+          list.items.forEach(function (listItem) {
+            data.forEach(function (detailElement) {
+              if (listItem.name == detailElement.itemId) {
+                listItem.iconId = detailElement.userIconItemId;
+                listItem.sectionId = detailElement.userSectionId;
+              }
+            });
+            _this.setIconUrl(listItem);
+          });
+          _this.logger.log("reporting new list", true);
+          callback(list);
+        }
+      })
+      .catch(err => {
+        if (retryNo < 3) {
+          setTimeout(() => { _this.getListDetail(list, callback, ++retryNo); }, 1000);
+        }
+        else {
+          _this.logger.logError("Unexpected error when connecting to bring server: " + err + ". Hopefully temporary. Will retry in 30 minutes.");
+          setTimeout(() => { _this.getListDetail(list, callback); }, 1800000);
+        }
+      })
   };
 
   BringProfile.prototype.getImagePath = function (imageId) {
