@@ -1,12 +1,12 @@
 {
   "name": "EXT-Bring",
-  "version": "1.2.1",
-  "rev": "230721",
+  "version": "1.2.2",
+  "rev": "230724",
   "description": "Displays Your Bring! List",
   "main": "EXT-Bring.js",
   "scripts": {
     "preinstall": "installer/preinstall.sh",
-    "postinstall": "installer/postinstall.sh",
+    "postinstall": "installer/postinstall.sh -m -b",
     "update": "installer/update.sh",
     "reset": "git reset --hard",
     "clean": "rm -rf node_modules package-lock.json"
@@ -24,7 +24,7 @@
     "url": "https://forum.bugsounet.fr"
   },
   "dependencies": {
-    "esbuild": "^0.18.15",
+    "esbuild": "^0.18.16",
     "glob": "^10.3.3",
     "https": "^1.0.0",
     "node-fetch": "^3.3.1",
