@@ -24,7 +24,7 @@
     "url": "https://forum.bugsounet.fr"
   },
   "dependencies": {
-    "esbuild": "^0.18.20",
+    "esbuild": "^0.19.2",
     "glob": "^10.3.4",
     "https": "^1.0.0",
     "node-fetch": "^3.3.2",
