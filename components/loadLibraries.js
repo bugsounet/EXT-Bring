@@ -9,8 +9,7 @@ function libraries(that) {
     // { "library to load" : "store library name" }
     { "../components/bring-lib.js": "bring" },
     { "ts-md5" : "tsMd5" },
-    { "https" : "https" },
-    { "fetch" : "fetch" }
+    { "https" : "https" }
   ]
   let errors = 0
   return new Promise(resolve => {

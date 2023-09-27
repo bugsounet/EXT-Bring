@@ -41,7 +41,7 @@ var BringProfile = /** @class */ (function () {
   BringProfile.prototype.getListsForUser = function (callback, retryNo) {
     var _this = this;
     if (retryNo === void 0) { retryNo = 0; }
-    _this.lib.fetch(this.listsForUserUrl.replace(/\{userid\}/g, this.userid), this.fetchGetOptions())
+    fetch(this.listsForUserUrl.replace(/\{userid\}/g, this.userid), this.fetchGetOptions())
       .then(async response => {
         let data = await response.json()
         if (response && response.status != 200) {
@@ -73,7 +73,7 @@ var BringProfile = /** @class */ (function () {
   BringProfile.prototype.initializeCatalog = function (callback, retryNo) {
     var _this = this;
     if (retryNo === void 0) { retryNo = 0; }
-    _this.lib.fetch(this.catalogUrl, {
+    fetch(this.catalogUrl, {
       agent: _this.httpsAgent,
     })
       .then (async response => {
@@ -95,7 +95,7 @@ var BringProfile = /** @class */ (function () {
     var _this = this;
     if (retryNo === void 0) { retryNo = 0; }
     this.articleLocalization = [];
-    _this.lib.fetch(this.articleLocalizationUrl, {
+    fetch(this.articleLocalizationUrl, {
       agent: _this.httpsAgent,
     })
       .then(async response => {
@@ -141,7 +141,7 @@ var BringProfile = /** @class */ (function () {
     params.append("email", this.email)
     params.append("password", this.password)
 
-    _this.lib.fetch(this.authUrl, {
+    fetch(this.authUrl, {
       method: "POST",
       body: params
     })
@@ -197,7 +197,7 @@ var BringProfile = /** @class */ (function () {
       this.login(function () { _this.fetchList(listId, false, done); });
     }
     else {
-      _this.lib.fetch(this.listUrl.replace(/\{listId\}/, listId), this.fetchGetOptions())
+      fetch(this.listUrl.replace(/\{listId\}/, listId), this.fetchGetOptions())
         .then( async response => {
           let data = await response.json()
           if (response && response.status == 401 && reauthenticate) {
@@ -231,7 +231,7 @@ var BringProfile = /** @class */ (function () {
   BringProfile.prototype.getListDetail = function (list, callback, retryNo) {
     var _this = this;
     if (retryNo === void 0) { retryNo = 0; }
-    _this.lib.fetch(this.listItemDetailsUrl.replace(/\{listId\}/, list.listId), this.fetchGetOptions())
+    fetch(this.listItemDetailsUrl.replace(/\{listId\}/, list.listId), this.fetchGetOptions())
       .then(async response => {
         let data = await response.json()
         if (response && response.status != 200) {

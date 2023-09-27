@@ -1,7 +1,7 @@
 /* global Module */
 
 Module.register("EXT-Bring", {
-  requiresVersion: "2.22.0",
+  requiresVersion: "2.25.0",
   defaults: {
     debug: false,
     listName: "",
