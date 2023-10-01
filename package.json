@@ -1,7 +1,7 @@
 {
   "name": "EXT-Bring",
   "version": "1.2.3",
-  "rev": "230927",
+  "rev": "231001",
   "description": "Displays Your Bring! List",
   "main": "EXT-Bring.js",
   "scripts": {
