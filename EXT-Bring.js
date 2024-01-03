@@ -22,8 +22,8 @@ Module.register("EXT-Bring", {
 
   notificationReceived: function(notification, payload, sender) {
     switch (notification) {
-      case "GW_READY":
-        if (sender.name === "Gateway") {
+      case "GA_READY":
+        if (sender.name === "MMM-GoogleAssistant") {
           this.sendSocketNotification("INIT", this.config)
         }
         break

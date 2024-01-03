@@ -1,7 +1,7 @@
 {
   "name": "EXT-Bring",
-  "version": "1.2.3",
-  "rev": "231001",
+  "version": "1.3.0",
+  "rev": "240103",
   "description": "Displays Your Bring! List",
   "main": "EXT-Bring.js",
   "scripts": {
@@ -27,7 +27,7 @@
     "node": ">=18"
   },
   "dependencies": {
-    "esbuild": "^0.19.4",
+    "esbuild": "^0.19.11",
     "glob": "^10.3.7",
     "https": "^1.0.0",
     "ts-md5": "^1.3.1"
