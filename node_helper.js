@@ -1,5 +1,5 @@
 "use strict";
-/** Magic Mirror
+/**
  * Node Helper: EXT-Bring
  *
  * By Robert Seidt
