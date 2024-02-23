@@ -2,12 +2,14 @@
  * by Robert Seidt
  * modified by @bugsounet
  **/
+ 
+/* eslint-disable no-param-reassign */
 
 "use strict";
 
 /** Profile **/
 var BringProfile = /** @class */ (function () {
-  function BringProfile(email, password, language, logger, lib) {
+  function BringProfile (email, password, language, logger, lib) {
     this.authUrl = "https://api.getbring.com/rest/v2/bringauth";
     this.listUrl = "https://api.getbring.com/rest/v2/bringlists/{listId}";
     this.listsForUserUrl = "https://api.getbring.com/rest/v2/bringusers/{userid}/lists";
@@ -23,17 +25,17 @@ var BringProfile = /** @class */ (function () {
     this.logger = logger;
     this.lib = lib;
     this.httpsAgent = new this.lib.https.Agent({
-      rejectUnauthorized: false,
+      rejectUnauthorized: false
     });
   }
 
   BringProfile.prototype.fetchGetOptions = function () {
     return {
       headers: {
-        'Authorization': "Bearer " + this.access_token,
-        'X-BRING-COUNTRY': 'DE',
-        'X-BRING-USER-UUID': this.userid,
-        'X-BRING-API-KEY': 'cof4Nc6D8saplXjE3h3HXqHH8m7VU2i1Gs0g85Sp'
+        Authorization: `Bearer ${  this.access_token}`,
+        "X-BRING-COUNTRY": "DE",
+        "X-BRING-USER-UUID": this.userid,
+        "X-BRING-API-KEY": "cof4Nc6D8saplXjE3h3HXqHH8m7VU2i1Gs0g85Sp"
       }
     };
   };
@@ -42,53 +44,53 @@ var BringProfile = /** @class */ (function () {
     var _this = this;
     if (retryNo === void 0) { retryNo = 0; }
     fetch(this.listsForUserUrl.replace(/\{userid\}/g, this.userid), this.fetchGetOptions())
-      .then(async response => {
-        let data = await response.json()
-        if (response && response.status != 200) {
-          _this.logger.logError("Received unexpected status code from bring server when loading Lists for User: " + response.statusCode);
+      .then(async (response) => {
+        let data = await response.json();
+        if (response && response.status !== 200) {
+          _this.logger.logError(`Received unexpected status code from bring server when loading Lists for User: ${  response.statusCode}`);
         } else {
           if (data.lists) {
             data.lists.forEach(function (item) {
               if (_this.userLists.filter(function (l) { return l.listId === item.listUuid; }).length === 0) {
-                _this.userLists.push({ hash: '', items: [], listId: item.listUuid, listName: item.name });
+                _this.userLists.push({ hash: "", items: [], listId: item.listUuid, listName: item.name });
               }
             });
             callback();
           }
           else {
-            _this.logger.logError("Could not find 'lists' Element in Response from bring: " + data);
+            _this.logger.logError(`Could not find 'lists' Element in Response from bring: ${  data}`);
           }
         }
       })
-     .catch (err => {
+      .catch ((err) => {
         if (retryNo < 3) {
           setTimeout(() => { _this.getListsForUser(callback, ++retryNo); }, 1000);
         } else {
-          _this.logger.logError("Unexpected error connecting to bringList: " + err + ". Hopefully temporary. Will retry in 30 minutes.");
+          _this.logger.logError(`Unexpected error connecting to bringList: ${  err  }. Hopefully temporary. Will retry in 30 minutes.`);
           setTimeout(() => { _this.getListsForUser(callback); }, 1800000);
         }
-      })
+      });
   };
 
   BringProfile.prototype.initializeCatalog = function (callback, retryNo) {
     var _this = this;
     if (retryNo === void 0) { retryNo = 0; }
     fetch(this.catalogUrl, {
-      agent: _this.httpsAgent,
+      agent: _this.httpsAgent
     })
-      .then (async response => {
-        let data = await response.json()
+      .then (async (response) => {
+        let data = await response.json();
         _this.catalog = data.catalog;
         callback();
       })
-      .catch (err => {
+      .catch ((err) => {
         if (retryNo < 3) {
           setTimeout(() => { _this.initializeCatalog(callback, ++retryNo); }, 1000);
         } else {
-          _this.logger.logError("Unexpected error during download of Catalog: " + err + ". Hopefully temporary. Will retry in 30 minutes.");
+          _this.logger.logError(`Unexpected error during download of Catalog: ${  err  }. Hopefully temporary. Will retry in 30 minutes.`);
           setTimeout(()=> { _this.initializeCatalog(callback); }, 1800000);
         }
-      })
+      });
   };
 
   BringProfile.prototype.initializeArticleLocalization = function (callback, retryNo) {
@@ -96,10 +98,10 @@ var BringProfile = /** @class */ (function () {
     if (retryNo === void 0) { retryNo = 0; }
     this.articleLocalization = [];
     fetch(this.articleLocalizationUrl, {
-      agent: _this.httpsAgent,
+      agent: _this.httpsAgent
     })
-      .then(async response => {
-        let data = await response.json()
+      .then(async (response) => {
+        let data = await response.json();
         for (var key in data) {
           if (Object.prototype.hasOwnProperty.call(data, key)) {
             var val = data[key];
@@ -108,14 +110,14 @@ var BringProfile = /** @class */ (function () {
         }
         callback();
       })
-      .catch (err => {
+      .catch ((err) => {
         if (retryNo < 3) {
           setTimeout(() => { _this.initializeArticleLocalization(callback, ++retryNo); }, 1000);
         } else {
-          _this.logger.logError("Unexpected error during download of ArticleLocalization: " + err + ". Hopefully temporary. Will retry in 30 minutes.");
+          _this.logger.logError(`Unexpected error during download of ArticleLocalization: ${  err  }. Hopefully temporary. Will retry in 30 minutes.`);
           setTimeout(() => { _this.initializeArticleLocalization(callback); }, 1800000);
         }
-      })
+      });
   };
 
   BringProfile.prototype.login = function (callback, retryNo) {
@@ -138,16 +140,16 @@ var BringProfile = /** @class */ (function () {
     }
 
     const params = new URLSearchParams();
-    params.append("email", this.email)
-    params.append("password", this.password)
+    params.append("email", this.email);
+    params.append("password", this.password);
 
     fetch(this.authUrl, {
       method: "POST",
       body: params
     })
-      .then(async response => {
-        let data = await response.json()
-        if (response && response.status == 401) {
+      .then(async (response) => {
+        let data = await response.json();
+        if (response && response.status === 401) {
           _this.logger.logError("Could not authenticate to bringList.");
         } else {
           _this.access_token = data.access_token;
@@ -159,15 +161,15 @@ var BringProfile = /** @class */ (function () {
           });
         }
       })
-      .catch (err => {
+      .catch ((err) => {
         if (retryNo < 3) {
           _this.login(callback, ++retryNo);
         }
         else {
-          _this.logger.logError("Unexpected error when connecting to bring server: " + err + ". Hopefully temporary. Will retry in 30 minutes.");
+          _this.logger.logError(`Unexpected error when connecting to bring server: ${  err  }. Hopefully temporary. Will retry in 30 minutes.`);
           setTimeout(() => { _this.login(callback); }, 1800000);
         }
-      })
+      });
   };
 
   BringProfile.prototype.loadList = function (listName, done) {
@@ -186,11 +188,11 @@ var BringProfile = /** @class */ (function () {
       this.fetchList(list.listId, true, done);
     }
     else {
-      this.logger.logError('A list with the name "' + listName + '" does not exist in your user Profile. We found the following lists: ' + this.userLists.map(function (l) { return l.listName; }).join(', '));
+      this.logger.logError(`A list with the name "${  listName  }" does not exist in your user Profile. We found the following lists: ${  this.userLists.map(function (l) { return l.listName; }).join(", ")}`);
     }
   };
 
-   BringProfile.prototype.fetchList = function (listId, reauthenticate, done, retryNo) {
+  BringProfile.prototype.fetchList = function (listId, reauthenticate, done, retryNo) {
     var _this = this;
     if (retryNo === void 0) { retryNo = 0; }
     if (!this.access_token && reauthenticate) {
@@ -198,13 +200,13 @@ var BringProfile = /** @class */ (function () {
     }
     else {
       fetch(this.listUrl.replace(/\{listId\}/, listId), this.fetchGetOptions())
-        .then( async response => {
-          let data = await response.json()
-          if (response && response.status == 401 && reauthenticate) {
+        .then( async (response) => {
+          let data = await response.json();
+          if (response && response.status === 401 && reauthenticate) {
             _this.login(function () { _this.fetchList(listId, false, done); });
           }
-          else if (response && response.status != 200) {
-            _this.logger.logError("Received unexpected status code from bring server: " + response.status);
+          else if (response && response.status !== 200) {
+            _this.logger.logError(`Received unexpected status code from bring server: ${  response.status}`);
           } else {
             var list = _this.userLists.filter(function (l) { return l.listId === listId; })[0];
             list.items = [];
@@ -217,14 +219,14 @@ var BringProfile = /** @class */ (function () {
             done(list);
           }
         })
-        .catch (err => {
+        .catch ((err) => {
           if (retryNo < 3) {
             setTimeout(()=> { _this.fetchList(listId, reauthenticate, done, ++retryNo); }, 1000);
           } else {
-            _this.logger.logError("Unexpected error when connecting to bring server: " + err + ". Hopefully temporary. Will retry in 30 minutes.");
+            _this.logger.logError(`Unexpected error when connecting to bring server: ${  err  }. Hopefully temporary. Will retry in 30 minutes.`);
             setTimeout(()=> { _this.fetchList(listId, reauthenticate, done); }, 1800000);
           }
-        })
+        });
     }
   };
 
@@ -232,14 +234,14 @@ var BringProfile = /** @class */ (function () {
     var _this = this;
     if (retryNo === void 0) { retryNo = 0; }
     fetch(this.listItemDetailsUrl.replace(/\{listId\}/, list.listId), this.fetchGetOptions())
-      .then(async response => {
-        let data = await response.json()
-        if (response && response.status != 200) {
-          _this.logger.logError("Received unexpected status code from bring server: " + response.status);
+      .then(async (response) => {
+        let data = await response.json();
+        if (response && response.status !== 200) {
+          _this.logger.logError(`Received unexpected status code from bring server: ${  response.status}`);
         } else {
           list.items.forEach(function (listItem) {
             data.forEach(function (detailElement) {
-              if (listItem.name == detailElement.itemId) {
+              if (listItem.name === detailElement.itemId) {
                 listItem.iconId = detailElement.userIconItemId;
                 listItem.sectionId = detailElement.userSectionId;
               }
@@ -250,32 +252,32 @@ var BringProfile = /** @class */ (function () {
           callback(list);
         }
       })
-      .catch(err => {
+      .catch((err) => {
         if (retryNo < 3) {
           setTimeout(() => { _this.getListDetail(list, callback, ++retryNo); }, 1000);
         }
         else {
-          _this.logger.logError("Unexpected error when connecting to bring server: " + err + ". Hopefully temporary. Will retry in 30 minutes.");
+          _this.logger.logError(`Unexpected error when connecting to bring server: ${  err  }. Hopefully temporary. Will retry in 30 minutes.`);
           setTimeout(() => { _this.getListDetail(list, callback); }, 1800000);
         }
-      })
+      });
   };
 
   BringProfile.prototype.getImagePath = function (imageId) {
     var filename = imageId.toLowerCase()
-      .replace(' ', '_')
-      .replace('ü', 'ue')
-      .replace('ä', 'ae')
-      .replace('ö', 'oe')
-      .replace('é', 'e')
-      .replace('ß', 'ss')
-      .replace('-', '_');
-    filename = filename + ".png";
+      .replace(" ", "_")
+      .replace("ü", "ue")
+      .replace("ä", "ae")
+      .replace("ö", "oe")
+      .replace("é", "e")
+      .replace("ß", "ss")
+      .replace("-", "_");
+    filename = `${filename  }.png`;
     filename = this.imagePathTemplate.replace(/\{filename\}/g, filename);
     return filename;
   };
   BringProfile.prototype.getLocalName = function (elementName) {
-    var matchArticles = this.articleLocalization.filter(function (l) { return l.key == elementName; });
+    var matchArticles = this.articleLocalization.filter(function (l) { return l.key === elementName; });
     if (matchArticles.length > 0)
       return matchArticles[0].value;
     else
@@ -298,12 +300,16 @@ var BringProfile = /** @class */ (function () {
   BringProfile.prototype.setImageToItem = function (sectionId, lookupId, listItem) {
     var lookupItems = [];
     if (sectionId) {
-      lookupItems = this.catalog.sections.filter(function (s) { return s.sectionId == sectionId; })[0].items;
+      lookupItems = this.catalog.sections.filter(function (s) { return s.sectionId === sectionId; })[0].items;
     }
     else {
-      this.catalog.sections.forEach(function (s) { return s.items.forEach(function (it) { return lookupItems.push(it); }); });
+      this.catalog.sections.forEach(function (s) {
+        return s.items.forEach(function (it) {
+          return lookupItems.push(it);
+        });
+      });
     }
-    if (lookupItems.filter(function (i) { return i.itemId == lookupId; }).length > 0) {
+    if (lookupItems.filter(function (i) { return i.itemId === lookupId; }).length > 0) {
       listItem.imagePath = this.getImagePath(lookupId);
     }
     else {
@@ -316,16 +322,16 @@ exports.BringProfile = BringProfile;
 
 /** Log **/
 var BringLogger = /** @class */ (function () {
-  function BringLogger(config) {
+  function BringLogger (config) {
     this.config = config;
   }
   BringLogger.prototype.log = function (message, verbose) {
     if (!verbose || this.config.debug) {
-      console.log("[BRING] [CORE] " + message);
+      console.log(`[BRING] [CORE] ${  message}`);
     }
   };
   BringLogger.prototype.logError = function (message) {
-    console.error("[BRING] [CORE] " + message);
+    console.error(`[BRING] [CORE] ${  message}`);
   };
   return BringLogger;
 }());
@@ -333,7 +339,7 @@ exports.BringLogger = BringLogger;
 
 /** Updater **/
 var BringUpdater = /** @class */ (function () {
-  function BringUpdater(lib) {
+  function BringUpdater (lib) {
     this.lib = lib;
     this.bringProfiles = [];
     this.queryJobs = [];
@@ -356,15 +362,15 @@ var BringUpdater = /** @class */ (function () {
     }
     if (matchJobs.length > 0) {
       job = matchJobs[0];
-      if (job.listsToTrack.filter(function (n) { return n.listName == config.listName; }).length == 0) {
-        job.listsToTrack.push({ listName: config.listName, hash: '' });
+      if (job.listsToTrack.filter(function (n) { return n.listName === config.listName; }).length === 0) {
+        job.listsToTrack.push({ listName: config.listName, hash: "" });
       }
       else {
-        job.listsToTrack.filter(function (n) { return n.listName == config.listName; })[0].hash = '';
+        job.listsToTrack.filter(function (n) { return n.listName === config.listName; })[0].hash = "";
       }
     }
     else {
-      job = { email: config.email, listsToTrack: [{ listName: config.listName, hash: '' }] };
+      job = { email: config.email, listsToTrack: [{ listName: config.listName, hash: "" }] };
       this.queryJobs.push(job);
     }
   };
@@ -375,7 +381,7 @@ var BringUpdater = /** @class */ (function () {
       if (job.listsToTrack.filter(function (n) { return n.listName === config.listName; }).length > 0) {
         job.listsToTrack = job.listsToTrack.filter(function (n) { return n.listName !== config.listName; });
       }
-      if (job.listsToTrack.length == 0) {
+      if (job.listsToTrack.length === 0) {
         this.queryJobs = this.queryJobs.filter(function (j) { return j.email !== config.email; });
       }
     }
@@ -388,7 +394,7 @@ var BringUpdater = /** @class */ (function () {
         var profile = _this.bringProfiles.filter(function (p) { return p.email === job.email; })[0];
         job.listsToTrack.forEach(function (list) {
           profile.loadList(list.listName, function (l) {
-            if (l.hash != list.hash) {
+            if (l.hash !== list.hash) {
               _this.logger.log("Refresh Bring!", false);
               profile.getListDetail(l, function (detailedList) {
                 list.hash = l.hash;
