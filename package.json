@@ -15,6 +15,11 @@
     "test": "npm run lint",
     "test:minify": "cd installer && node minify.js"
   },
+  "keywords": [
+    "magic mirror",
+    "shopping list",
+    "google assistant"
+  ],
   "authors": [
     "Robert Seidt",
     "@bugsounet"
