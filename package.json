@@ -1,7 +1,7 @@
 {
   "name": "EXT-Bring",
-  "version": "1.4.0",
-  "rev": "240223",
+  "version": "1.4.1",
+  "rev": "240303",
   "description": "Displays Your Bring! List",
   "main": "EXT-Bring.js",
   "scripts": {
@@ -16,6 +16,7 @@
     "test:minify": "cd installer && node minify.js"
   },
   "keywords": [
+    "MMM-GoogleAssistant",
     "magic mirror",
     "shopping list",
     "google assistant"
@@ -43,7 +44,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^8.57.0",
-    "@stylistic/eslint-plugin": "^1.6.2",
+    "@stylistic/eslint-plugin": "^1.6.3",
     "eslint": "^8.57.0",
     "eslint-plugin-import": "^2.29.1"
   }
