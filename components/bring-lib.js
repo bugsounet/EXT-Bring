@@ -58,7 +58,7 @@ var BringProfile = /** @class */ (function () {
             callback();
           }
           else {
-            _this.logger.logError(`Could not find 'lists' Element in Response from bring: ${  data}`);
+            _this.logger.logError(`Could not find 'lists' Element in Response from bring: ${data}`);
           }
         }
       })
@@ -66,7 +66,7 @@ var BringProfile = /** @class */ (function () {
         if (retryNo < 3) {
           setTimeout(() => { _this.getListsForUser(callback, ++retryNo); }, 1000);
         } else {
-          _this.logger.logError(`Unexpected error connecting to bringList: ${  err  }. Hopefully temporary. Will retry in 30 minutes.`);
+          _this.logger.logError(`Unexpected error connecting to bringList: ${err}. Hopefully temporary. Will retry in 30 minutes.`);
           setTimeout(() => { _this.getListsForUser(callback); }, 1800000);
         }
       });
@@ -87,7 +87,7 @@ var BringProfile = /** @class */ (function () {
         if (retryNo < 3) {
           setTimeout(() => { _this.initializeCatalog(callback, ++retryNo); }, 1000);
         } else {
-          _this.logger.logError(`Unexpected error during download of Catalog: ${  err  }. Hopefully temporary. Will retry in 30 minutes.`);
+          _this.logger.logError(`Unexpected error during download of Catalog: ${err}. Hopefully temporary. Will retry in 30 minutes.`);
           setTimeout(()=> { _this.initializeCatalog(callback); }, 1800000);
         }
       });
@@ -114,7 +114,7 @@ var BringProfile = /** @class */ (function () {
         if (retryNo < 3) {
           setTimeout(() => { _this.initializeArticleLocalization(callback, ++retryNo); }, 1000);
         } else {
-          _this.logger.logError(`Unexpected error during download of ArticleLocalization: ${  err  }. Hopefully temporary. Will retry in 30 minutes.`);
+          _this.logger.logError(`Unexpected error during download of ArticleLocalization: ${err}. Hopefully temporary. Will retry in 30 minutes.`);
           setTimeout(() => { _this.initializeArticleLocalization(callback); }, 1800000);
         }
       });
@@ -166,7 +166,7 @@ var BringProfile = /** @class */ (function () {
           _this.login(callback, ++retryNo);
         }
         else {
-          _this.logger.logError(`Unexpected error when connecting to bring server: ${  err  }. Hopefully temporary. Will retry in 30 minutes.`);
+          _this.logger.logError(`Unexpected error when connecting to bring server: ${err}. Hopefully temporary. Will retry in 30 minutes.`);
           setTimeout(() => { _this.login(callback); }, 1800000);
         }
       });
@@ -188,7 +188,7 @@ var BringProfile = /** @class */ (function () {
       this.fetchList(list.listId, true, done);
     }
     else {
-      this.logger.logError(`A list with the name "${  listName  }" does not exist in your user Profile. We found the following lists: ${  this.userLists.map(function (l) { return l.listName; }).join(", ")}`);
+      this.logger.logError(`A list with the name "${listName}" does not exist in your user Profile. We found the following lists: ${this.userLists.map(function (l) { return l.listName; }).join(", ")}`);
     }
   };
 
@@ -257,7 +257,7 @@ var BringProfile = /** @class */ (function () {
           setTimeout(() => { _this.getListDetail(list, callback, ++retryNo); }, 1000);
         }
         else {
-          _this.logger.logError(`Unexpected error when connecting to bring server: ${  err  }. Hopefully temporary. Will retry in 30 minutes.`);
+          _this.logger.logError(`Unexpected error when connecting to bring server: ${err}. Hopefully temporary. Will retry in 30 minutes.`);
           setTimeout(() => { _this.getListDetail(list, callback); }, 1800000);
         }
       });
@@ -327,11 +327,11 @@ var BringLogger = /** @class */ (function () {
   }
   BringLogger.prototype.log = function (message, verbose) {
     if (!verbose || this.config.debug) {
-      console.log(`[BRING] [CORE] ${  message}`);
+      console.log(`[BRING] [CORE] ${message}`);
     }
   };
   BringLogger.prototype.logError = function (message) {
-    console.error(`[BRING] [CORE] ${  message}`);
+    console.error(`[BRING] [CORE] ${message}`);
   };
   return BringLogger;
 }());

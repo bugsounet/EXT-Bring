@@ -48,6 +48,12 @@ Module.register("EXT-Bring", {
           this.updateDom(400);
         }
         break;
+      case "ERROR":
+        this.sendNotification("EXT_ALERT", {
+          message: `Error: ${payload}`,
+          type: "error"
+        });
+        break;
     }
   },
 
@@ -58,8 +64,8 @@ Module.register("EXT-Bring", {
   getDom () {
     var Bring = document.createElement("div");
     Bring.id = "EXT-Bring";
-    Bring.style.maxWidth= `${(this.config.columns * 101) + 1  }px`;
-    Bring.style.maxHeight= `${this.config.maxRows * 119  }px`;
+    Bring.style.maxWidth= `${(this.config.columns * 101) + 1}px`;
+    Bring.style.maxHeight= `${this.config.maxRows * 119}px`;
 
     if (this.listData) {
       this.listData.items.forEach((element) => {

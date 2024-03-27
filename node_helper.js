@@ -49,7 +49,7 @@ module.exports = NodeHelper.create({
       case "INIT":
         this.config = payload;
         if (this.config.debug) logBring = (...args) => { console.log("[BRING]", ...args); };
-        console.log(`[BRING] ${  require("./package.json").name  } Version:`, require("./package.json").version , "rev:", require("./package.json").rev);
+        console.log(`[BRING] ${require("./package.json").name} Version:`, require("./package.json").version , "rev:", require("./package.json").rev);
         this.parse();
         break;
       case "START":
@@ -62,12 +62,12 @@ module.exports = NodeHelper.create({
   },
 
   async parse () {
-    //if (this.config.debug) logBring = (...args) => { console.log("[BRING] [DATA]", ...args); };
     this.config.language = await this.languageConfig();
     console.log(`[BRING] [DATA] Language set to: ${this.config.language}`);
     let bugsounet = await this.libraries();
     if (bugsounet) {
       console.error(`[BRING] [DATA] Warning: ${bugsounet} needed library not loaded !`);
+      this.sendSocketNotification("ERROR", `${bugsounet} needed library not loaded !`);
       return;
     }
     this.updater= new this.lib.bring.BringUpdater(this.lib);
@@ -76,15 +76,21 @@ module.exports = NodeHelper.create({
 
   languageConfig () {
     if (this.config.lang === 0) return "fr-FR";
-    else if (!this.config.lang || isNaN(this.config.lang) || (this.config.lang > Object.keys(this.langDB).length-1) || (this.config.lang < 0)) {
-      console.error("[BRING] [DATA] Mismake on config lang... set to fr-Fr");
+    if (typeof(this.config.lang) !== "number") {
+      console.error("[BRING] [DATA] Mistake on config lang (must be a number) -> set language to fr-Fr");
+      this.sendSocketNotification("ERROR", "Mistake on config lang (must be a number) -> set language to fr-Fr");
+      return "fr-FR";
+    }
+    if ((this.config.lang > Object.keys(this.langDB).length-1) || (this.config.lang < 0)) {
+      console.error(`[BRING] [DATA] Mistake on config lang [0 to ${Object.keys(this.langDB).length-1}]-> set language to fr-Fr`);
+      this.sendSocketNotification("ERROR", `Mistake on config lang [0 to ${Object.keys(this.langDB).length-1}]-> set language to fr-Fr`);
       return "fr-FR";
     }
 
     return new Promise((resolve) => {
       Object.entries(this.langDB).some((entry) => {
         const [number,key] = entry;
-        if (this.config.lang === number) {
+        if (this.config.lang === parseInt(number)) {
           resolve(key);
           return key; // stop process if match
         }
@@ -110,7 +116,7 @@ module.exports = NodeHelper.create({
           try {
             if (!this.lib[libraryName]) {
               this.lib[libraryName] = require(libraryToLoad);
-              logBring("[LIBRARIES] Loaded:", libraryToLoad, "->", `this.lib.${libraryName}`);
+              logBring("[BRING] [LIBRARIES] Loaded:", libraryToLoad, "->", `this.lib.${libraryName}`);
             }
           } catch (e) {
             console.error("[BRING] [LIBRARIES]", libraryToLoad, "Loading error!" , e.toString());
@@ -121,7 +127,7 @@ module.exports = NodeHelper.create({
         }
       });
       resolve(errors);
-      if (!errors) console.log("[BRING] [[LIBRARIES]] All libraries loaded!");
+      if (!errors) console.log("[BRING] [LIBRARIES] All libraries loaded!");
     });
   },
 
