@@ -1,6 +1,7 @@
 #EXT-Bring {
   position:relative;
   overflow-y:hidden;
+  display: inline-block;
 }
 
 #EXT-Bring_Contener {
