@@ -1,7 +1,7 @@
 {
   "name": "EXT-Bring",
-  "version": "1.4.3",
-  "rev": "240421",
+  "version": "1.5.0",
+  "rev": "240701",
   "description": "Displays Your Bring! List",
   "main": "EXT-Bring.js",
   "scripts": {
@@ -31,11 +31,11 @@
     "url": "https://github.com/bugsounet/EXT-Bring"
   },
   "bugs": {
-    "url": "https://forum.bugsounet.fr"
+    "url": "https://github.com/bugsounet/EXT-Bring/issues"
   },
-  "homepage": "https://wiki.bugsounet.fr/en/EXT-Alert",
+  "homepage": "https://wiki.bugsounet.fr/en/EXT-Bring",
   "engines": {
-    "node": ">=18"
+    "node": ">=20"
   },
   "dependencies": {
     "esbuild": "^0.21.5",
@@ -44,7 +44,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^8.57.0",
-    "@stylistic/eslint-plugin": "^2.1.0",
+    "@stylistic/eslint-plugin": "^1.8.1",
     "eslint": "^8.57.0",
     "eslint-plugin-import": "^2.29.1"
   }
